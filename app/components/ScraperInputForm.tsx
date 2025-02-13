@@ -32,10 +32,13 @@ export default function ScraperInputForm() {
     formData.append("num_results", String(searches));
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/scrape", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "https://orm-automation-backend.onrender.com/scrape",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const data = await response.json();
       console.log("Response from backend: ", data);

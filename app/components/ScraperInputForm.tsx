@@ -33,7 +33,7 @@ export default function ScraperInputForm() {
 
     try {
       const response = await fetch(
-        "https://orm-automation-tool-0494f308f710.herokuapp.com/scrape",
+        "https://orm-automation-tool-0494f308f710.herokuapp.com/",
         {
           method: "POST",
           body: formData,

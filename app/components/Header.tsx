@@ -1,3 +1,7 @@
 export default function Header() {
-  return <header>BuzzDealer's ORM Status Automation Tool</header>;
+  return (
+    <header>
+      <h1>BuzzDealer's ORM Status Automation Tool</h1>
+    </header>
+  );
 }

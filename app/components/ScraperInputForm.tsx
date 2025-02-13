@@ -1,16 +1,32 @@
 "use client";
 
-import { SetStateAction, useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import googleDomains from "./googleDomains.json" assert { type: "json" };
 
 export default function ScraperInputForm() {
   const [googleLocation, setGoogleLocation] = useState("google.com");
   const [keywords, setKeywords] = useState("");
   const [searches, setSearches] = useState(10);
+  const [fileLinks, setFileLinks] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [dots, setDots] = useState(".");
+
+  const prod_url =
+    "https://orm-automation-tool-0494f308f710.herokuapp.com/scrape";
+  const dev_url = "http://127.0.0.1:8000/scrape";
+
+  useEffect(() => {
+    if (loading) {
+      const interval = setInterval(() => {
+        setDots((prev) => (prev === "..." ? "." : prev + "."));
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [loading]);
 
   function handleInputChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-    theInput: String
+    theInput: string
   ) {
     const { value } = e.target;
 
@@ -25,6 +41,7 @@ export default function ScraperInputForm() {
 
   const formSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
     const formData = new FormData();
     formData.append("country", String(googleLocation));
@@ -32,35 +49,32 @@ export default function ScraperInputForm() {
     formData.append("num_results", String(searches));
 
     try {
-      const response = await fetch(
-        "https://orm-automation-tool-0494f308f710.herokuapp.com/scrape",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch(dev_url, {
+        method: "POST",
+        body: formData,
+      });
 
       const data = await response.json();
       console.log("Response from backend: ", data);
+      setFileLinks(data.files);
     } catch (err) {
       console.error("Error: ", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <form
-        onSubmit={(e) => {
-          formSubmit(e);
-        }}
-      >
-        <div>
+    <div className="container">
+      <form onSubmit={formSubmit} className="form">
+        <div className="form-group">
           <label htmlFor="google-countries">Select your Google domain</label>
           <select
             name="google-countries"
             id="google-countries"
             value={googleLocation}
             onChange={(e) => handleInputChange(e, "domain-selector")}
+            className="select"
           >
             <option value="google.com">google.com - Global</option>
             {googleDomains.map((area) => (
@@ -70,7 +84,7 @@ export default function ScraperInputForm() {
             ))}
           </select>
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="keywords">
             Enter your keywords separated by a comma
           </label>
@@ -78,12 +92,14 @@ export default function ScraperInputForm() {
             type="text"
             name="keywords"
             id="keywords"
+            required
             value={keywords}
             placeholder="keyword1, keyword2"
             onChange={(e) => handleInputChange(e, "keywords")}
+            className="input"
           />
         </div>
-        <div>
+        <div className="form-group">
           <label htmlFor="searches">
             Enter how many searches you'd like to retrieve
           </label>
@@ -95,10 +111,43 @@ export default function ScraperInputForm() {
             placeholder="8"
             value={searches}
             onChange={(e) => handleInputChange(e, "searches")}
+            className="input"
           />
         </div>
-        <button type="submit">Submit Scrape Request</button>
+        <button type="submit" className="submit-btn">
+          Submit Scrape Request
+        </button>
       </form>
+
+      {loading && <div className="loading">Scraping{dots}</div>}
+
+      {fileLinks && (
+        <div className="results">
+          <h3>Download Results</h3>
+          {Object.keys(fileLinks).map((searchTerm) => {
+            const { csv, screenshot } = fileLinks[searchTerm];
+            return (
+              <div key={searchTerm} className="result-item">
+                <h4>Results for: {searchTerm}</h4>
+                <a
+                  href={`${dev_url}/${csv}`}
+                  download
+                  className="download-link"
+                >
+                  Download CSV
+                </a>
+                <a
+                  href={`${dev_url}/${screenshot}`}
+                  download
+                  className="download-link"
+                >
+                  Download Screenshot
+                </a>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

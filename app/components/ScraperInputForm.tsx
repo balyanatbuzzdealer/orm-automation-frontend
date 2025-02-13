@@ -15,6 +15,8 @@ export default function ScraperInputForm() {
     "https://orm-automation-tool-0494f308f710.herokuapp.com/scrape";
   const dev_url = "http://127.0.0.1:8000/scrape";
 
+  const BACKEND_URL = prod_url;
+
   useEffect(() => {
     if (loading) {
       const interval = setInterval(() => {
@@ -49,7 +51,7 @@ export default function ScraperInputForm() {
     formData.append("num_results", String(searches));
 
     try {
-      const response = await fetch(dev_url, {
+      const response = await fetch(BACKEND_URL, {
         method: "POST",
         body: formData,
       });
@@ -130,16 +132,18 @@ export default function ScraperInputForm() {
               <div key={searchTerm} className="result-item">
                 <h4>Results for: {searchTerm}</h4>
                 <a
-                  href={`${dev_url}/${csv}`}
+                  href={`${BACKEND_URL}/${csv}`}
                   download
                   className="download-link"
+                  target="_blank"
                 >
                   Download CSV
                 </a>
                 <a
-                  href={`${dev_url}/${screenshot}`}
+                  href={`${BACKEND_URL}/${screenshot}`}
                   download
                   className="download-link"
+                  target="_blank"
                 >
                   Download Screenshot
                 </a>

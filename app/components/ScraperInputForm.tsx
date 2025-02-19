@@ -15,7 +15,7 @@ export default function ScraperInputForm() {
     "https://orm-automation-tool-0494f308f710.herokuapp.com/scrape";
   const dev_url = "http://127.0.0.1:8000/scrape";
 
-  const BACKEND_URL = prod_url;
+  const BACKEND_URL = dev_url;
 
   useEffect(() => {
     if (loading) {

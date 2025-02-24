@@ -67,7 +67,7 @@ export default function ScraperInputForm() {
   };
 
   return (
-    <div className="container">
+    <div className="search-form">
       <form onSubmit={formSubmit} className="form">
         <div className="form-group">
           <label htmlFor="google-countries">Select your Google domain</label>
@@ -127,23 +127,25 @@ export default function ScraperInputForm() {
         <div className="results">
           <h3>Download Results</h3>
           {Object.keys(fileLinks).map((searchTerm) => {
-            const { csv, screenshot } = fileLinks[searchTerm];
+            const { csv_link, screenshot_link } = fileLinks[searchTerm];
             return (
               <div key={searchTerm} className="result-item">
                 <h4>Results for: {searchTerm}</h4>
                 <a
-                  href={`${BACKEND_URL}/${csv}`}
+                  href={csv_link}
                   download
                   className="download-link"
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Download CSV
                 </a>
                 <a
-                  href={`${BACKEND_URL}/${screenshot}`}
+                  href={screenshot_link}
                   download
                   className="download-link"
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Download Screenshot
                 </a>

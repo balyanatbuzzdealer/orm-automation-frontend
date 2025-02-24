@@ -2,12 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useAppStore } from "../store";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const router = useRouter();
+
+  const makeTrue = useAppStore((state) => state.makeTrue);
+  const loggedIn = useAppStore((state) => state.loggedIn);
 
   const prod_url =
     "https://orm-automation-tool-0494f308f710.herokuapp.com/login";
@@ -30,10 +34,12 @@ export default function Login() {
       });
 
       const data = await response.json();
-      console.log(data);
 
       if (data.login === "authenticated") {
+        makeTrue();
         router.push("/");
+      } else {
+        alert("Invalid email or password");
       }
     } catch (err) {
       console.error(err);
@@ -66,9 +72,6 @@ export default function Login() {
         </div>
         <button type="submit">Login</button>
       </form>
-      <p>
-        Don't have an account? <a href="/signup">Sign Up</a>
-      </p>
     </div>
   );
 }

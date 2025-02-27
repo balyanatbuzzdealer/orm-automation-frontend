@@ -1,5 +1,11 @@
 "use client";
 
+interface ScrapeResult {
+  csv_file?: string;
+  screenshot_file?: string;
+  [key: string]: any;
+}
+
 import { useState, useEffect } from "react";
 import googleDomains from "./googleDomains.json" assert { type: "json" };
 
@@ -7,7 +13,7 @@ export default function ScraperInputForm() {
   const [googleLocation, setGoogleLocation] = useState("google.com");
   const [keywords, setKeywords] = useState("");
   const [searches, setSearches] = useState(10);
-  const [fileLinks, setFileLinks] = useState<any>(null);
+  const [scrapeResults, setScrapeResults] = useState<ScrapeResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [dots, setDots] = useState(".");
 
@@ -58,7 +64,12 @@ export default function ScraperInputForm() {
 
       const data = await response.json();
       console.log("Response from backend: ", data);
-      setFileLinks(data.files);
+
+      if (data.status === "success") {
+        setScrapeResults(data.results);
+      } else {
+        alert("Error: " + data.error);
+      }
     } catch (err) {
       console.error("Error: ", err);
     } finally {
@@ -123,35 +134,10 @@ export default function ScraperInputForm() {
 
       {loading && <div className="loading">Scraping{dots}</div>}
 
-      {fileLinks && (
-        <div className="results">
-          <h3>Download Results</h3>
-          {Object.keys(fileLinks).map((searchTerm) => {
-            const { csv_link, screenshot_link } = fileLinks[searchTerm];
-            return (
-              <div key={searchTerm} className="result-item">
-                <h4>Results for: {searchTerm}</h4>
-                <a
-                  href={csv_link}
-                  download
-                  className="download-link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Download CSV
-                </a>
-                <a
-                  href={screenshot_link}
-                  download
-                  className="download-link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Download Screenshot
-                </a>
-              </div>
-            );
-          })}
+      {scrapeResults.length > 0 && (
+        <div className="scrape-successful">
+          <p>Scrape sucessful</p>
+          <p>Results saved in /output folder</p>
         </div>
       )}
     </div>
